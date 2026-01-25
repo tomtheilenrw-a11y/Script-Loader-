@@ -13,7 +13,7 @@ local LocalPlayer = Players.LocalPlayer
 -- 🔐 ERLAUBTE USER IDS
 local Whitelist = {
     [2433342775] = false, -- TurboKid2021
-    [987654321] = true, -- Beispiel
+    [987654321] = false, -- Beispiel
     -- weitere IDs hier hinzufügen
 }
 
