@@ -1,0 +1,153 @@
+--// =========================================
+--// SL2 Multi-Script Loader + WHITELIST
+--// by Tom
+--// =========================================
+
+--// ================================
+--// USERID WHITELIST
+--// ================================
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- 🔐 ERLAUBTE USER IDS
+local Whitelist = {
+    [123456789] = true, -- Beispiel
+    [987654321] = true, -- Beispiel
+    -- weitere IDs hier hinzufügen
+}
+
+if not Whitelist[LocalPlayer.UserId] then
+    LocalPlayer:Kick(
+        "❌ Access denied!\n\n" ..
+        "You are not whitelisted.\n\n" ..
+        "Join this Discord to get access:\n" ..
+        "https://discord.gg/ZCFsxswyv6"
+    )
+    return
+end
+
+print("[Loader] ✅ Whitelist check passed")
+
+--// ================================
+--// MULTI SCRIPT LOADER (ANTI DUPE)
+--// ================================
+
+local LoadedScripts = {}
+
+local function safeLoad(url, name)
+    if LoadedScripts[url] then
+        print("[Loader] ❌ Already loaded → SKIP: " .. name)
+        return
+    end
+
+    LoadedScripts[url] = true
+
+    task.spawn(function()
+        local ok, result = pcall(function()
+            return loadstring(game:HttpGet(url))()
+        end)
+
+        if ok then
+            print("[Loader] ✅ Loaded: " .. name)
+        else
+            warn("[Loader] ⚠️ Error loading: " .. name .. " | " .. tostring(result))
+        end
+    end)
+end
+
+local scripts = {
+    {name = "Aim Lock", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/refs/heads/main/Aim%20Lock%20%7C%20SL2"},
+    {name = "ESP", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/refs/heads/main/ESP%20%7C%20SL2"},
+    {name = "No Cooldown", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/refs/heads/main/NO%20%7C%20CD%20%7C%20Shindo%20life%202"},
+    {name = "Click TP", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/refs/heads/main/SL2%20%7C%20Click%20tp"},
+    {name = "Fly", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/refs/heads/main/SL2%20%7C%20FLY"}
+}
+
+for _, script in ipairs(scripts) do
+    safeLoad(script.url, script.name)
+end
+
+--// ================================
+--// CONSOLE SPACER (OPTIONAL)
+--// ================================
+
+task.spawn(function()
+    while task.wait(1) do
+        print(".")
+    end
+end)
+
+--// ================================
+--// PURE TEXT INFO GUI
+--// ================================
+
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "SL2_Info_GUI"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game:GetService("CoreGui")
+
+local Frame = Instance.new("Frame")
+Frame.Parent = ScreenGui
+Frame.AnchorPoint = Vector2.new(1, 0.5)
+Frame.Position = UDim2.new(1, -20, 0.5, 0)
+Frame.Size = UDim2.new(0, 230, 0, 120)
+Frame.BackgroundTransparency = 1
+Frame.BorderSizePixel = 0
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Parent = Frame
+UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+UIListLayout.Padding = UDim.new(0, 4)
+
+local function makeLabel(text)
+    local lbl = Instance.new("TextLabel")
+    lbl.Parent = Frame
+    lbl.Size = UDim2.new(1, -10, 0, 22)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = text
+    lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+    lbl.Font = Enum.Font.GothamSemibold
+    lbl.TextSize = 18
+    lbl.TextWrapped = false
+    lbl.TextXAlignment = Enum.TextXAlignment.Center
+    return lbl
+end
+
+makeLabel("Use ] for No-CD")
+makeLabel("STRG + Click = TP")
+makeLabel("MouseWheel Click = Lock")
+makeLabel("P = Toggle Fly")
+makeLabel("RightShift = Hide UI")
+
+local visible = true
+
+local tweenIn = TweenService:Create(
+    Frame,
+    TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+    { Position = UDim2.new(1, -20, 0.5, 0) }
+)
+
+local tweenOut = TweenService:Create(
+    Frame,
+    TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.In),
+    { Position = UDim2.new(1, 260, 0.5, 0) }
+)
+
+UserInputService.InputBegan:Connect(function(input, gp)
+    if gp then return end
+    if input.KeyCode == Enum.KeyCode.RightShift then
+        visible = not visible
+        if visible then
+            tweenIn:Play()
+        else
+            tweenOut:Play()
+        end
+    end
+end)
+
+print("[Loader] 🚀 SL2 Loader fully initialized")
