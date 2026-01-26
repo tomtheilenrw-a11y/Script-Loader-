@@ -1,80 +1,51 @@
 --// =========================================
---// SL2 Multi-Script Loader + GITHUB WHITELIST
+--// SL2 Multi-Script Loader + WHITELIST
 --// by Tom
 --// =========================================
 
 --// ================================
---// SERVICES
+--// USERID WHITELIST (GITHUB)
 --// ================================
 
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
 local LocalPlayer = Players.LocalPlayer
 
---// ================================
---// GITHUB WHITELIST CONFIG
---// ================================
-
 local WHITELIST_URL =
     "https://raw.githubusercontent.com/tomtheilenrw-a11y/Whitelist/main/whitelist.json"
 
---// ================================
---// LOAD WHITELIST
---// ================================
+local Whitelist = {}
 
-local function loadWhitelist()
+do
     local success, response = pcall(function()
         return game:HttpGet(WHITELIST_URL)
     end)
 
     if not success then
-        warn("[Loader] ❌ Failed to fetch whitelist")
-        return nil
+        LocalPlayer:Kick("❌ Whitelist server not reachable")
+        return
     end
 
-    local decoded
-    success, decoded = pcall(function()
+    local data
+    success, data = pcall(function()
         return HttpService:JSONDecode(response)
     end)
 
-    if not success then
-        warn("[Loader] ❌ Invalid whitelist JSON")
-        return nil
+    if not success or type(data) ~= "table" or type(data.whitelist) ~= "table" then
+        LocalPlayer:Kick("❌ Invalid whitelist data")
+        return
     end
 
-    return decoded
-end
-
-local whitelistData = loadWhitelist()
-
-if not whitelistData or not whitelistData.whitelist then
-    LocalPlayer:Kick(
-        "❌ Whitelist error\n\n" ..
-        "Could not verify access.\n" ..
-        "Please contact staff on Discord."
-    )
-    return
-end
-
---// ================================
---// CHECK USER
---// ================================
-
-local allowed = false
-local userIdStr = tostring(LocalPlayer.UserId)
-
-for _, id in ipairs(whitelistData.whitelist) do
-    if tostring(id) == userIdStr then
-        allowed = true
-        break
+    for _, id in ipairs(data.whitelist) do
+        Whitelist[tonumber(id)] = true
     end
 end
 
-if not allowed then
+if not Whitelist[LocalPlayer.UserId] then
     LocalPlayer:Kick(
         "❌ Access denied!\n\n" ..
         "You are not whitelisted.\n\n" ..
-        "Join Discord to request access:\n" ..
+        "Join this Discord to get access:\n" ..
         "https://discord.gg/ZCFsxswyv6"
     )
     return
@@ -110,16 +81,26 @@ local function safeLoad(url, name)
 end
 
 local scripts = {
-    {name = "Aim Lock", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/main/Aim%20Lock%20%7C%20SL2"},
-    {name = "ESP", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/main/ESP%20%7C%20SL2"},
-    {name = "No Cooldown", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/main/NO%20%7C%20CD%20%7C%20Shindo%20life%202"},
-    {name = "Click TP", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/main/SL2%20%7C%20Click%20tp"},
-    {name = "Fly", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/main/SL2%20%7C%20FLY"}
+    {name = "Aim Lock", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/refs/heads/main/Aim%20Lock%20%7C%20SL2"},
+    {name = "ESP", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/refs/heads/main/ESP%20%7C%20SL2"},
+    {name = "No Cooldown", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/refs/heads/main/NO%20%7C%20CD%20%7C%20Shindo%20life%202"},
+    {name = "Click TP", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/refs/heads/main/SL2%20%7C%20Click%20tp"},
+    {name = "Fly", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/refs/heads/main/SL2%20%7C%20FLY"}
 }
 
 for _, script in ipairs(scripts) do
     safeLoad(script.url, script.name)
 end
+
+--// ================================
+--// CONSOLE SPACER (OPTIONAL)
+--// ================================
+
+task.spawn(function()
+    while task.wait(1) do
+        print(".")
+    end
+end)
 
 --// ================================
 --// PURE TEXT INFO GUI
@@ -139,8 +120,10 @@ Frame.AnchorPoint = Vector2.new(1, 0.5)
 Frame.Position = UDim2.new(1, -20, 0.5, 0)
 Frame.Size = UDim2.new(0, 230, 0, 120)
 Frame.BackgroundTransparency = 1
+Frame.BorderSizePixel = 0
 
-local UIListLayout = Instance.new("UIListLayout", Frame)
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Parent = Frame
 UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 UIListLayout.Padding = UDim.new(0, 4)
@@ -154,6 +137,7 @@ local function makeLabel(text)
     lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
     lbl.Font = Enum.Font.GothamSemibold
     lbl.TextSize = 18
+    lbl.TextWrapped = false
     lbl.TextXAlignment = Enum.TextXAlignment.Center
     return lbl
 end
@@ -168,13 +152,13 @@ local visible = true
 
 local tweenIn = TweenService:Create(
     Frame,
-    TweenInfo.new(0.3, Enum.EasingStyle.Quint),
+    TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
     { Position = UDim2.new(1, -20, 0.5, 0) }
 )
 
 local tweenOut = TweenService:Create(
     Frame,
-    TweenInfo.new(0.3, Enum.EasingStyle.Quint),
+    TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.In),
     { Position = UDim2.new(1, 260, 0.5, 0) }
 )
 
@@ -182,7 +166,11 @@ UserInputService.InputBegan:Connect(function(input, gp)
     if gp then return end
     if input.KeyCode == Enum.KeyCode.RightShift then
         visible = not visible
-        (visible and tweenIn or tweenOut):Play()
+        if visible then
+            tweenIn:Play()
+        else
+            tweenOut:Play()
+        end
     end
 end)
 
