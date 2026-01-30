@@ -1,57 +1,16 @@
 --// =========================================
---// SL2 Multi-Script Loader + WHITELIST
+--// SL2 Multi-Script Loader (NO WHITELIST)
 --// by Tom
 --// =========================================
 
 --// ================================
---// USERID WHITELIST (GITHUB)
+--// SERVICES
 --// ================================
 
 local Players = game:GetService("Players")
-local HttpService = game:GetService("HttpService")
 local LocalPlayer = Players.LocalPlayer
 
-local WHITELIST_URL =
-    "https://raw.githubusercontent.com/tomtheilenrw-a11y/Whitelist/main/whitelist.json"
-
-local Whitelist = {}
-
-do
-    local success, response = pcall(function()
-        return game:HttpGet(WHITELIST_URL)
-    end)
-
-    if not success then
-        LocalPlayer:Kick("❌ Whitelist server not reachable")
-        return
-    end
-
-    local data
-    success, data = pcall(function()
-        return HttpService:JSONDecode(response)
-    end)
-
-    if not success or type(data) ~= "table" or type(data.whitelist) ~= "table" then
-        LocalPlayer:Kick("❌ Invalid whitelist data")
-        return
-    end
-
-    for _, id in ipairs(data.whitelist) do
-        Whitelist[tonumber(id)] = true
-    end
-end
-
-if not Whitelist[LocalPlayer.UserId] then
-    LocalPlayer:Kick(
-        "❌ Access denied!\n\n" ..
-        "You are not whitelisted.\n\n" ..
-        "Join this Discord to get access:\n" ..
-        "https://discord.gg/ZCFsxswyv6"
-    )
-    return
-end
-
-print("[Loader] ✅ Whitelist check passed")
+print("[Loader] ✅ No whitelist active – public access")
 
 --// ================================
 --// MULTI SCRIPT LOADER (ANTI DUPE)
@@ -86,6 +45,7 @@ local scripts = {
     {name = "No Cooldown", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/refs/heads/main/NO%20%7C%20CD%20%7C%20Shindo%20life%202"},
     {name = "Click TP", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/refs/heads/main/SL2%20%7C%20Click%20tp"},
     {name = "Fly", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/refs/heads/main/SL2%20%7C%20FLY"}
+    {name = "reset", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/refs/heads/main/SL2%7C%20Reset%20in%20Danger"}
 }
 
 for _, script in ipairs(scripts) do
@@ -137,13 +97,12 @@ local function makeLabel(text)
     lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
     lbl.Font = Enum.Font.GothamSemibold
     lbl.TextSize = 18
-    lbl.TextWrapped = false
     lbl.TextXAlignment = Enum.TextXAlignment.Center
     return lbl
 end
 
 makeLabel("Use ] for No-CD")
-makeLabel("STRG + Click = TP")
+makeLabel("CTRL + Click = TP")
 makeLabel("MouseWheel Click = Lock")
 makeLabel("P = Toggle Fly")
 makeLabel("RightShift = Hide UI")
@@ -174,4 +133,4 @@ UserInputService.InputBegan:Connect(function(input, gp)
     end
 end)
 
-print("[Loader] 🚀 SL2 Loader fully initialized")
+print("[Loader] 🚀 SL2 Loader fully initialized (PUBLIC)")
