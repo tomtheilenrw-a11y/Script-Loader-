@@ -44,7 +44,7 @@ local scripts = {
     {name = "ESP", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/refs/heads/main/ESP%20%7C%20SL2"},
     {name = "No Cooldown", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/refs/heads/main/NO%20%7C%20CD%20%7C%20Shindo%20life%202"},
     {name = "Click TP", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/refs/heads/main/SL2%20%7C%20Click%20tp"},
-    {name = "Fly", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/refs/heads/main/SL2%20%7C%20FLY"}
+    {name = "Fly", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/refs/heads/main/SL2%20%7C%20FLY"},
     {name = "reset", url = "https://raw.githubusercontent.com/tomtheilenrw-a11y/Shindo-Life-2-Reaper-Hunter/refs/heads/main/SL2%7C%20Reset%20in%20Danger"}
 }
 
